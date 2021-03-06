@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -18,9 +19,12 @@ namespace OrderUpdater.Service
 
         private Timer _timer;
 
-        public OrderHandlerService(ILogger<OrderHandlerService> logger)
+        private CustomContext _context;
+
+        public OrderHandlerService(ILogger<OrderHandlerService> logger, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
+            _context = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CustomContext>();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,28 +36,25 @@ namespace OrderUpdater.Service
 
         public void UpdateOrders(object state)
         {
-            using (var context = new CustomContext())
-            {
-                var nw = DateTime.Now;
-                var rawOrders = context.Orders.Where(o => o.Converted_Order == null || o.Converted_Order == string.Empty).ToList();
+            var nw = DateTime.Now;
+            var rawOrders = _context.Orders.Where(o => o.Converted_Order == null || o.Converted_Order == string.Empty).ToList();
 
-                if (rawOrders.Count > 0)
+            if (rawOrders.Count > 0)
+            {
+                foreach (var order in rawOrders)
                 {
-                    foreach (var order in rawOrders)
+                    try
                     {
-                        try
-                        {
-                            order.Converted_Order = ProcessOrder(order.System_Type, order.Source_Order);
-                        }
-                        catch(Exception e)
-                        {
-                            _logger.LogInformation("Problem into order processing.", e.ToString());
-                        }
+                        order.Converted_Order = ProcessOrder(order.System_Type, order.Source_Order);
+                    }
+                    catch(Exception e)
+                    {
+                        _logger.LogInformation("Problem into order processing.", e.ToString());
                     }
                 }
-
-                context.SaveChanges();
             }
+
+            _context.SaveChanges();
         }
 
         public string ProcessOrder(string type, string json)

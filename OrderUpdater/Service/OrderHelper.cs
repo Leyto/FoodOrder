@@ -10,27 +10,24 @@ namespace OrderUpdater.Service
     /// </summary>
     public static class OrderHelper
     {
-        public static bool BuildAndSaveOrder(JsonElement orderJson, string orderType)
+        public static bool BuildAndSaveOrder(CustomContext context, JsonElement orderJson, string orderType)
         {
-            using (var context = new CustomContext())
-            {
-                if (orderJson.ToString() == string.Empty) return false;
+            if (orderJson.ToString() == string.Empty) return false;
 
-                var orderView = JsonConvert.DeserializeObject<Model.View.OrderView>(orderJson.ToString());
+            var orderView = JsonConvert.DeserializeObject<Model.View.OrderView>(orderJson.ToString());
 
-                if (orderView == null) return false;
+            if (orderView == null) return false;
 
-                var order = new Order();
-                order.Id = Guid.NewGuid();
-                order.Order_Number = orderView.orderNumber;
-                order.Created_At = DateTime.Now;
-                order.System_Type = orderType;
-                order.Source_Order = orderJson.ToString();
+            var order = new Order();
+            order.Id = Guid.NewGuid();
+            order.Order_Number = orderView.orderNumber;
+            order.Created_At = DateTime.Now;
+            order.System_Type = orderType;
+            order.Source_Order = orderJson.ToString();
 
-                context.Orders.Add(order);
+            context.Orders.Add(order);
                 
-                return context.SaveChanges() > 0;
-            }
+            return context.SaveChanges() > 0;
         }
     }
 }

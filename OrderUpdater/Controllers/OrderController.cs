@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using OrderUpdater.Service;
 using System.Threading.Tasks;
+using OrderUpdater;
 
 namespace TestWebApi.Controllers
 {
@@ -12,11 +13,17 @@ namespace TestWebApi.Controllers
     [Route("api/order")]
     public class OrderController : ControllerBase
     {
+        private readonly CustomContext _context;
+        public OrderController(CustomContext context)
+        {
+            _context = context;
+        }
+
         [HttpPost]
         [Route("talabat")]
         public async Task<IActionResult> PostTalabatOrder([FromBody] JsonElement newOrder)
         {
-            if (OrderHelper.BuildAndSaveOrder(newOrder, "talabat"))
+            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "talabat"))
                 return Ok("talabat");
 
             return BadRequest();
@@ -26,7 +33,7 @@ namespace TestWebApi.Controllers
         [Route("zomato")]
         public async Task<IActionResult> PostZomatoOrder([FromBody] JsonElement newOrder)
         {
-            if (OrderHelper.BuildAndSaveOrder(newOrder, "zomato"))
+            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "zomato"))
                 return Ok("zomato");
 
             return BadRequest();
@@ -36,7 +43,7 @@ namespace TestWebApi.Controllers
         [Route("uber")]
         public async Task<IActionResult> PostUberOrder([FromBody] JsonElement newOrder)
         {
-            if (OrderHelper.BuildAndSaveOrder(newOrder, "uber"))
+            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "uber"))
                 return Ok("uber");
 
             return BadRequest();

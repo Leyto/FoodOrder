@@ -9,16 +9,8 @@ namespace OrderUpdater
         {
         }
 
-        public CustomContext()
-        {
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer($"Server=localhost\\SQLEXPRESS;Database=OrdersDb;Trusted_Connection=True;MultipleActiveResultSets=true");
-            }
         }
 
 
