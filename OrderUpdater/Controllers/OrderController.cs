@@ -20,31 +20,11 @@ namespace TestWebApi.Controllers
         }
 
         [HttpPost]
-        [Route("talabat")]
-        public async Task<IActionResult> PostTalabatOrder([FromBody] JsonElement newOrder)
+        [Route("{ordertype}")]
+        public async Task<IActionResult> PostOrder(string ordertype, [FromBody] JsonElement newOrder)
         {
-            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "talabat"))
-                return Ok("talabat");
-
-            return BadRequest();
-        }
-
-        [HttpPost]
-        [Route("zomato")]
-        public async Task<IActionResult> PostZomatoOrder([FromBody] JsonElement newOrder)
-        {
-            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "zomato"))
-                return Ok("zomato");
-
-            return BadRequest();
-        }
-
-        [HttpPost]
-        [Route("uber")]
-        public async Task<IActionResult> PostUberOrder([FromBody] JsonElement newOrder)
-        {
-            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, "uber"))
-                return Ok("uber");
+            if (OrderHelper.BuildAndSaveOrder(_context, newOrder, ordertype)) 
+                return Ok("New order add to Db");
 
             return BadRequest();
         }
