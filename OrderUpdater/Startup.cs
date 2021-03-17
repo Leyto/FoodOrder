@@ -21,7 +21,7 @@ namespace OrderUpdater
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<CustomContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
 
             services.AddHostedService<OrderHandlerService>();
 
